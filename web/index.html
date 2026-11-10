@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#13182c"><title>SafeSignal · Safety Companion</title>
+<link rel="stylesheet" href="/style.css"></head>
+<body><div class="shell"><header><div class="brand"><span class="mark">✦</span> SAFESIGNAL</div><span id="mode" class="pill">Checking configuration…</span></header>
+<main><section class="hero"><p class="eyebrow">PERSONAL SAFETY PROTOTYPE</p><h1>Support, when<br><em>it matters.</em></h1>
+<p>A transparent, privacy-conscious SOS prototype. Your location is shared only when you choose to include it and confirm an alert.</p></section>
+<div class="layout"><section class="panel sos"><p class="eyebrow">01 / REQUEST HELP</p><h2>Manual SOS</h2>
+<p>Press the button to prepare a message to your pre-configured trusted contact. The recipient is controlled by the server, never typed into this form.</p>
+<label class="check"><input id="location" type="checkbox"> Include my approximate location with the alert</label>
+<button id="sos" class="danger" aria-describedby="sos-explain">Prepare SOS <span>↗</span></button>
+<p id="sos-explain" class="sub">You will be asked to confirm. Demo mode never sends messages.</p>
+<div id="result" role="status" aria-live="polite" class="result">No alert sent.</div>
+</section>
+<section class="panel tools"><p class="eyebrow">02 / EVERYDAY CHECK-IN</p><h2>Set a check-in reminder</h2>
+<p>Stay on top of your planned arrival. This reminder works only while this browser page remains open.</p>
+<label for="minutes">Remind me in</label><select id="minutes"><option value="5">5 minutes</option><option value="15" selected>15 minutes</option><option value="30">30 minutes</option><option value="60">60 minutes</option></select>
+<div class="actions"><button id="start" class="primary">Start timer</button><button id="cancel" class="secondary">Cancel</button></div>
+<div id="timer" role="timer" class="timer">15:00</div><p class="sub">No automatic distress escalation. This is an on-screen reminder only.</p></section></div>
+<section class="notice"><h3>Need immediate help?</h3><p>If you are in danger, contact emergency services or trusted people directly. An internet connection, browser or SMS provider may fail. This prototype is not a certified safety device or an emergency dispatcher.</p></section>
+</main><footer>SAFESIGNAL / LOCAL-FIRST MVP · No tracking, user accounts, or location storage.</footer></div>
+<script src="/app.js"></script></body></html>
