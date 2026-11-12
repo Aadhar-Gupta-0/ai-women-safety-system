@@ -43,6 +43,21 @@ class SafetyPrototypeTests(unittest.TestCase):
         self.assertEqual(outcome["status"], "submitted_to_provider")
         self.assertEqual(parse_qs(request_seen[0][0].data.decode())["Body"], ["SOS!"])
 
+    def test_misconfigured_sms_is_distinguished_from_demo(self):
+        import os
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"TWILIO_ACCOUNT_SID": "invalid",
+                                      "TWILIO_AUTH_TOKEN": "secret",
+                                      "TWILIO_FROM_NUMBER": "+15551234567",
+                                      "ALERT_TO_NUMBER": "+15557654321"}, clear=True):
+            self.assertEqual(app.sms_mode(), "misconfigured")
+
+    def test_missing_sms_configuration_remains_demo(self):
+        import os
+        from unittest.mock import patch
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(app.sms_mode(), "demo")
+
 
 if __name__ == "__main__":
     unittest.main()
