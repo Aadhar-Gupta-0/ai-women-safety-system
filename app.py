@@ -63,6 +63,14 @@ def configured_sms():
     return sid, token, sender, receiver
 
 
+def sms_mode():
+    """Report misconfiguration safely without displaying credentials."""
+    try:
+        return "configured" if configured_sms() else "demo"
+    except ValueError:
+        return "misconfigured"
+
+
 def send_sms(message, config, opener=urlopen):
     """Delivery is attempted, not guaranteed; Twilio status must be monitored."""
     sid, token, sender, receiver = config
@@ -89,6 +97,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
         self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'")
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
@@ -97,8 +106,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?", 1)[0]
         if path == "/api/status":
-            self.json_response(200, {"mode": "configured" if configured_sms() else "demo",
-                                     "sms_configured": bool(configured_sms()),
+            mode = sms_mode()
+            self.json_response(200, {"mode": mode,
+                                     "sms_configured": mode == "configured",
                                      "warning": "Not an emergency service. Delivery is never guaranteed."})
             return
         assets = {"/": ("index.html", "text/html; charset=utf-8"),
@@ -128,6 +138,9 @@ class Handler(BaseHTTPRequestHandler):
         expected = f"http://127.0.0.1:{PORT}"
         if origin and origin not in (expected, f"http://localhost:{PORT}"):
             self.json_response(403, {"error": "Cross-origin requests are disabled"})
+            return
+        if self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower() != "application/json":
+            self.json_response(415, {"error": "JSON requests are required"})
             return
         try:
             size = int(self.headers.get("Content-Length", "0"))
