@@ -58,6 +58,14 @@ class SafetyPrototypeTests(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(app.sms_mode(), "demo")
 
+    def test_local_host_guard(self):
+        self.assertTrue(app.allowed_local_host(f"localhost:{app.PORT}"))
+        self.assertTrue(app.allowed_local_host(f"127.0.0.1:{app.PORT}"))
+        self.assertFalse(app.allowed_local_host("attacker.example"))
+        self.assertFalse(app.allowed_local_host(f"attacker.example:{app.PORT}"))
+        self.assertFalse(app.allowed_local_host(""))
+
+
 
 if __name__ == "__main__":
     unittest.main()
