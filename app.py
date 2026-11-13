@@ -24,6 +24,12 @@ last_delivery_attempt = 0.0
 MAX_BYTES = 2048
 
 
+def allowed_local_host(host):
+    """Reject DNS-rebinding host headers; this demo is loopback-only."""
+    return host in (f"127.0.0.1:{PORT}", f"localhost:{PORT}")
+
+
+
 def validate_location(value):
     if value is None:
         return None
@@ -104,6 +110,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(payload)
 
     def do_GET(self):
+        if not allowed_local_host(self.headers.get("Host", "")):
+            self.json_response(403, {"error": "Only local loopback hosts are allowed"})
+            return
         path = self.path.split("?", 1)[0]
         if path == "/api/status":
             mode = sms_mode()
@@ -130,6 +139,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         global last_delivery_attempt
+        if not allowed_local_host(self.headers.get("Host", "")):
+            self.json_response(403, {"error": "Only local loopback hosts are allowed"})
+            return
         if self.path != "/api/alerts":
             self.json_response(404, {"error": "Not found"})
             return
